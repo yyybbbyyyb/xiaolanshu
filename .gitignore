@@ -1,0 +1,7 @@
+# created by virtualenv automatically
+
+.venv
+/AccessKey.csv
+.idea/
+
+/config.yaml
