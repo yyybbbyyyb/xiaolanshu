@@ -1,7 +1,10 @@
 """
 注册
 登陆
+登出
+删除账户
 修改密码
+修改用户名
 修改头像
 获取用户信息
 """
@@ -11,8 +14,8 @@ import re
 from django.contrib.auth import authenticate, logout
 from django.views.decorators.http import require_POST
 
-from .user_auth import create_access_token, create_refresh_token
-from ..models import User
+from .user_auth import create_access_token, create_refresh_token, jwt_auth
+from ..models import User, Auth
 from ...utils import *
 
 
@@ -23,10 +26,9 @@ def user_register(request: HttpRequest):
 
     username = data.get('username')
     password = data.get('password')
-    password_again = data.get('password_again')
     email = data.get('email')
 
-    if not username or not password or not password_again or not email:
+    if not username or not password or not email:
         return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '内容未填写完整')
 
     # 检测数据合法性
@@ -37,8 +39,6 @@ def user_register(request: HttpRequest):
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '用户名需为5-15位字母、数字或下划线')
     if User.objects.filter(email=email).exists():
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '邮箱已存在')
-    if password != password_again:
-        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '两次密码不一致')
 
     # 创建用户
     User.objects.create_user(username=username, password=password, email=email)
@@ -73,4 +73,13 @@ def user_login(request: HttpRequest):
                                          'username': user.username,
                                          'token': token,
                                          'refresh_token': refresh_token})
+
+
+@response_wrapper
+@jwt_auth()
+@require_POST
+def user_logout(request: HttpRequest):
+    Auth.objects.filter(user=request.user).delete()
+    return success_api_response({'message': '登出成功'})
+
 

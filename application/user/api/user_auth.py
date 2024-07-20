@@ -4,7 +4,7 @@
 
 import jwt
 from django.utils import timezone
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_POST
 
 
 from ..models import User, Auth
@@ -12,7 +12,7 @@ from ...utils import *
 
 
 @response_wrapper
-@require_GET
+@require_POST
 def refresh_token(request: HttpRequest):
     """
     刷新token
@@ -92,7 +92,7 @@ def jwt_auth(allow_anonymous=False):
             user = get_user(request)
             if user is None or user.isDelete:
                 if not allow_anonymous:
-                    return failed_api_response(ErrorCode.UNAUTHORIZED_ERROR, '未登录')
+                    return failed_api_response(ErrorCode.UNAUTHORIZED_ERROR, 'jwt认证失败，请尝试refresh_token或重新登陆')
             request.user = user
             return api(request, *args, **kwargs)
         return wrapper
@@ -127,7 +127,7 @@ def create_refresh_token(user: User, refresh_token_delta: int = 7) -> str:
     current_time = timezone.now()
 
     # 删除旧的refresh token
-    Auth.objects.filter(user=user, type='refresh_token').delete()
+    Auth.objects.filter(user=user).delete()
 
     auth = Auth.objects.create(user=user, login_at=current_time,
                                expires_at=current_time + timezone.timedelta(days=refresh_token_delta))

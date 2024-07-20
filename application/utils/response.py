@@ -2,7 +2,6 @@ import warnings
 from enum import Enum, unique
 
 from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
 
 @unique
 class ErrorCode(Enum):
@@ -90,7 +89,7 @@ def failed_api_response(code, error_msg=None) -> dict:
 def response_wrapper(func):
     """
     decorate a function to return from a dict to a JsonResponse object
-    :param func: a api-function
+    :param func: an api-function
     :return: wrapped function
     """
     def _inner(*args, **kwargs):
