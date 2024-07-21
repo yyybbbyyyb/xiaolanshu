@@ -20,17 +20,19 @@ class User(AbstractUser):
     password = models.CharField(max_length=256, verbose_name='密码')
     email = models.EmailField(max_length=255, verbose_name='邮箱', unique=True, error_messages={'unique': '邮箱已存在'})
 
-    student_id = models.CharField(max_length=10, verbose_name='学号', null=True, blank=True, unique=True, error_messages={'unique': '学号已存在'})
+    student_id = models.CharField(max_length=10, verbose_name='学号', null=True, blank=True, unique=True,
+                                  error_messages={'unique': '学号已存在'})
     gender_choices = (
         ('null', '沃尔玛购物袋'),
         ('male', '男'),
         ('female', '女')
     )
     gender = models.CharField(choices=gender_choices, max_length=6, default='null', verbose_name='性别')
-    intorduction = models.TextField(max_length=200, verbose_name='个人简介', default='这个人很懒，什么都没有留下')
-    avatar = models.ImageField(upload_to='media/avatar/', default='media/avatar/default.png', verbose_name='头像')
+    introduction = models.TextField(max_length=200, verbose_name='个人简介', default='这个人很懒，什么都没有留下')
+    avatar = models.ImageField(upload_to='avatar/', default='avatar/default.png', verbose_name='头像')
 
-    # collections = models.ManyToManyField('post.Post', related_name='收藏列表', blank=True, verbose_name='收藏', through='Collection')
+    # collections = models.ManyToManyField('post.Post', related_name='收藏列表', blank=True, verbose_name='收藏',
+    # through='Collection')
 
     isDelete = models.BooleanField(default=False)
 
