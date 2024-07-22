@@ -1,5 +1,5 @@
 """
-user's info model
+user's info models
 """
 
 from django.db import models
@@ -8,7 +8,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     """
-    user's info model
+    user's info models
     AbstractUser:
         内置了date_joined字段，用于记录用户注册时间
         内置了last_login字段，用于记录用户最后登录时间
@@ -31,7 +31,7 @@ class User(AbstractUser):
     introduction = models.TextField(max_length=200, verbose_name='个人简介', default='这个人很懒，什么都没有留下')
     avatar = models.ImageField(upload_to='avatar/', default='avatar/default.png', verbose_name='头像')
 
-    # collections = models.ManyToManyField('post.Post', related_name='收藏列表', blank=True, verbose_name='收藏',
+    collections = models.ManyToManyField('post.Post', related_name='收藏列表', blank=True, verbose_name='收藏'),
     # through='Collection')
 
     isDelete = models.BooleanField(default=False)

@@ -14,6 +14,12 @@ from pathlib import Path
 import pymysql
 import yaml
 
+# 解决force_text被弃用而图床上传图片失败的问题
+import django
+from django.utils.encoding import force_str
+django.utils.encoding.force_text = force_str
+
+
 with open('config.yaml', 'r') as f:
     config = yaml.safe_load(f)
 
@@ -137,16 +143,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # set aliyun oss
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-DEFAULT_FILE_STORAGE = 'aliyun_oss2_storage.backends.AliyunMediaStorage'
+
+DEFAULT_FILE_STORAGE = 'django_oss_storage.backends.OssMediaStorage'
 
 OSS_ACCESS_KEY_ID = config['oss']['oss_access_key_id']
 OSS_ACCESS_KEY_SECRET = config['oss']['oss_access_key_secret']
-OSS_END_POINT = config['oss']['oss_end_point']
+OSS_ENDPOINT = config['oss']['oss_end_point']
 OSS_PREFIX_URL = config['oss']['oss_prefix_url']
 OSS_BUCKET_NAME = config['oss']['oss_bucket_name']
 OSS_BUCKET_ACL_TYPE = config['oss']['oss_bucket_alc_type']  # private, public-read, public-read-write
 
-OSS_MEDIA_URL = OSS_PREFIX_URL + OSS_BUCKET_NAME + '.' + OSS_END_POINT + '/'
+OSS_MEDIA_URL = OSS_PREFIX_URL + OSS_BUCKET_NAME + '.' + OSS_ENDPOINT + '/' + MEDIA_URL
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

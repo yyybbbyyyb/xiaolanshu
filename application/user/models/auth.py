@@ -1,5 +1,5 @@
 """
-auth info model
+auth info models
 """
 
 from django.db import models
@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 
 class Auth(models.Model):
     """
-    a user's auth info model
+    a user's auth info models
     """
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='auth_info')

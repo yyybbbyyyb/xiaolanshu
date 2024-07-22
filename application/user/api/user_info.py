@@ -53,18 +53,18 @@ def user_register(request: HttpRequest):
 def user_login(request: HttpRequest):
     data = parse_request_data(request)
 
-    username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
 
-    if not username or not password:
+    if not email or not password:
         return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '内容未填写完整')
 
-    user = authenticate(username=username, password=password)
+    user = authenticate(email=email, password=password)
     if user is None:
-        if User.objects.filter(username=username).exists():
+        if User.objects.filter(email=email).exists():
             return failed_api_response(ErrorCode.CANNOT_LOGIN_ERROR, '密码错误')
         else:
-            return failed_api_response(ErrorCode.CANNOT_LOGIN_ERROR, '用户不存在')
+            return failed_api_response(ErrorCode.CANNOT_LOGIN_ERROR, '邮箱不存在')
     else:
         if user.isDelete:
             return failed_api_response(ErrorCode.CANNOT_LOGIN_ERROR, '用户已注销, 请联系管理员')
