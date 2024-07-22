@@ -31,10 +31,20 @@ class User(AbstractUser):
     introduction = models.TextField(max_length=200, verbose_name='个人简介', default='这个人很懒，什么都没有留下')
     avatar = models.ImageField(upload_to='avatar/', default='avatar/default.png', verbose_name='头像')
 
-    collections = models.ManyToManyField('post.Post', related_name='收藏列表', blank=True, verbose_name='收藏'),
-    # through='Collection')
+    cafeteria_collections = models.ManyToManyField('cafeteria.Cafeteria', related_name='收藏食堂列表', blank=True,
+                                                   through='CafeteriaCollection')
+    counter_collections = models.ManyToManyField('cafeteria.Counter', related_name='收藏窗口列表', blank=True,
+                                                 through='CounterCollection')
+    post_collections = models.ManyToManyField('post.Post', related_name='收藏帖子列表', blank=True,
+                                              through='PostCollection')
+    eat_collections = models.ManyToManyField('post.Post', related_name='吃过的食物列表', blank=True,
+                                             through='EatCollection')
 
     isDelete = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
 
     class Meta:
         ordering = ['-date_joined']

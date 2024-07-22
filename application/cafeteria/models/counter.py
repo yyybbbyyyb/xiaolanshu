@@ -12,8 +12,6 @@ class Counter(models.Model):
     image = models.ImageField(upload_to='counter/', default='counter/default.png', verbose_name='窗口图片')
     floor = models.IntegerField(verbose_name='楼层', default=1)
 
-    collector = models.ManyToManyField('user.User', related_name='收藏窗口', blank=True)
-
     def __str__(self):
         return self.name
 

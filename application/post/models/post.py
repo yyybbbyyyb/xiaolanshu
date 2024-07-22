@@ -11,4 +11,4 @@ class Post(models.Model):
     content = models.TextField(max_length=500, verbose_name='帖子内容')
     author = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='作者')
     created_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
-    images = models.CharField(max_length=1024, verbose_name='图片url集', blank=True)
+    images = models.TextField(max_length=1024, verbose_name='图片url集', blank=True)

@@ -28,11 +28,12 @@ def parse_request_data(request: HttpRequest) -> dict:
 
 
 UPLOAD_FOLDER_MAPPING = {
-    'avatar': 'media/avatar/',
-    'dish': 'media/dish/',
-    'cafeteria': 'media/cafeteria/',
-    'counter': 'media/counter/',
-    'default': 'media/default/',
+    'avatar': 'avatar/',
+    'dish': 'dish/',
+    'cafeteria': 'cafeteria/',
+    'counter': 'counter/',
+    'default': 'default/',
+    'post': 'post/',
 }
 
 
@@ -45,15 +46,16 @@ def upload_img_file(image, folder='default'):
     """
 
     number = uuid.uuid4()
-    img_name = UPLOAD_FOLDER_MAPPING[folder] + str(number) + '.jpg'
-    img_url = settings.OSS_MEDIA_URL + img_name
+    img_path = 'media/' + UPLOAD_FOLDER_MAPPING[folder] + str(number) + '.jpg'
+    img_url = settings.OSS_MEDIA_URL + UPLOAD_FOLDER_MAPPING[folder] + str(number) + '.jpg'
 
     auth = oss2.Auth(settings.OSS_ACCESS_KEY_ID, settings.OSS_ACCESS_KEY_SECRET)
-    bucket = oss2.Bucket(auth, settings.OSS_END_POINT, settings.OSS_BUCKET_NAME)
+    bucket = oss2.Bucket(auth, settings.OSS_ENDPOINT, settings.OSS_BUCKET_NAME)
 
     try:
-        bucket.put_object(img_name, image.read())
+        bucket.put_object(img_path, image.read())
         return img_url
     except oss2.exceptions.OssError as e:
         print(f"上传图片失败: {e}")
         return ''
+

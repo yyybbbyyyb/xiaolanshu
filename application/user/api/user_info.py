@@ -59,7 +59,8 @@ def user_login(request: HttpRequest):
     if not email or not password:
         return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '内容未填写完整')
 
-    user = authenticate(email=email, password=password)
+    user = authenticate(username=email, password=password)
+
     if user is None:
         if User.objects.filter(email=email).exists():
             return failed_api_response(ErrorCode.CANNOT_LOGIN_ERROR, '密码错误')
@@ -189,7 +190,9 @@ def user_change_info(request: HttpRequest):
 @jwt_auth()
 @require_GET
 def user_get_info(request: HttpRequest):
-    user = User(request.user)
+    user = request.user
+    user = User.objects.get(id=user.id)
+
     return success_api_response({
         'id': user.id,
         'username': user.username,
