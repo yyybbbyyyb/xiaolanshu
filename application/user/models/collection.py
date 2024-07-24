@@ -10,7 +10,7 @@ class CafeteriaCollection(models.Model):
         'User', on_delete=models.CASCADE, null=False, db_index=True,
         related_name='cafeteria_collector'
     )
-    collections = models.ForeignKey(
+    cafeteria = models.ForeignKey(
         'cafeteria.Cafeteria', on_delete=models.CASCADE, null=False, db_index=True,
         related_name='cafeteria_collections'
     )
@@ -30,7 +30,7 @@ class CounterCollection(models.Model):
         'User', on_delete=models.CASCADE, null=False, db_index=True,
         related_name='counter_collector'
     )
-    collections = models.ForeignKey(
+    counter = models.ForeignKey(
         'cafeteria.Counter', on_delete=models.CASCADE, null=False, db_index=True,
         related_name='counter_collections'
     )
@@ -50,7 +50,7 @@ class PostCollection(models.Model):
         'User', on_delete=models.CASCADE, null=False, db_index=True,
         related_name='post_collector'
     )
-    collections = models.ForeignKey(
+    post = models.ForeignKey(
         'post.Post', on_delete=models.CASCADE, null=False, db_index=True,
         related_name='post_collections'
     )
@@ -70,7 +70,7 @@ class EatCollection(models.Model):
         'User', on_delete=models.CASCADE, null=False, db_index=True,
         related_name='eat_collector'
     )
-    collections = models.ForeignKey(
+    post = models.ForeignKey(
         'post.Post', on_delete=models.CASCADE, null=False, db_index=True,
         related_name='eat_collections'
     )

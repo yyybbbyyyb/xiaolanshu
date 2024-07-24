@@ -14,8 +14,7 @@ urlpatterns = [
     path('get-info', user_get_info, name='get_info'),
     path('get-info-by-id', user_get_info_by_id, name='get_info_by_id'),
 
-
-
-
     path('refresh-token', refresh_token, name='refresh_token'),
+
+    path('get-user-action-info', get_user_action_info, name='get_user_action_info'),
 ]

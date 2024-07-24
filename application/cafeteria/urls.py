@@ -9,4 +9,8 @@ urlpatterns = [
 
     path('get-all-cafeterias', get_all_cafeterias, name='get_all_cafeterias'),
 
+    path('get-cafeteria', get_cafeteria, name='get_cafeteria'),
+
+    path('get-counter', get_counter, name='get_counter'),
+
 ]

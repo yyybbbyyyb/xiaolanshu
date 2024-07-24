@@ -11,3 +11,10 @@ class Dish(models.Model):
     description = models.TextField(max_length=200, verbose_name='菜品描述', blank=True)
     price = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='菜品价格')
     image = models.ImageField(upload_to='dish/', default='dish/default.png', verbose_name='菜品图片')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '菜品'
+        verbose_name_plural = verbose_name
