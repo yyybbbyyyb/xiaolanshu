@@ -35,9 +35,9 @@ class User(AbstractUser):
                                                    through='CafeteriaCollection')
     counter_collections = models.ManyToManyField('cafeteria.Counter', related_name='收藏窗口列表', blank=True,
                                                  through='CounterCollection')
-    post_collections = models.ManyToManyField('post.Post', related_name='收藏帖子列表', blank=True,
+    post_collections = models.ManyToManyField('post.Post', related_name='collected_by', blank=True,
                                               through='PostCollection')
-    eat_collections = models.ManyToManyField('post.Post', related_name='吃过的食物列表', blank=True,
+    eat_collections = models.ManyToManyField('post.Post', related_name='eaten_by', blank=True,
                                              through='EatCollection')
 
     isDelete = models.BooleanField(default=False)
