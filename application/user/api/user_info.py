@@ -48,8 +48,8 @@ def user_register(request: HttpRequest):
     return success_api_response({'message': '注册成功'})
 
 
-@response_wrapper
 @require_POST
+@response_wrapper
 def user_login(request: HttpRequest):
     data = parse_request_data(request)
 
@@ -72,6 +72,7 @@ def user_login(request: HttpRequest):
         else:
             token = create_access_token(user)
             refresh_token = create_refresh_token(user)
+            print("成功")
             return success_api_response({'message': '登录成功',
                                          'username': user.username,
                                          'token': token,

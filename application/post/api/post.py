@@ -69,3 +69,5 @@ def get_recommend(request: HttpRequest):
     })
 
 
+
+

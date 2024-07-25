@@ -1,47 +1,10 @@
 # xiaolanshu
 
-> 以下抄自xc的readme
-
 - 可能得要求python3.8以上的版本
 - 不要在本地pip，在虚拟环境中pip
   - 及时更新requirements.txt，保证项目可运行
-- 项目无关的生成文件记得添加进 .gitignore
-- 当然直接跑是跑不了的，要开发记得找我要config文件（这个我还没做，目前配置信息先不急着填进去，我18，19号内完成）
 
-## git 规范 （啊啊这个我目前还没太熟，我们可以笨一点手动合并先）
-
-- 创建自己的分支
-
-```bash
-git branch xxxx; git checkout xxxx
-# or
-git checkout -b xxxx
-```
-
-- 每一次完成自己的更改之后，需要先变基到主分支上(保证主分支是线性的)，再发起push -f (如果push不上，就加上 force 选项)
-  - 如果发现变基的时候有冲突，那就是有两个人的工作冲突了，修改了相同的代码。
-
-```bash
-git rebase main
-git push -f
-```
-
-- 然后在 GitHub 上创建 pull request，可 merge 的条件是
-  - 有一人审核通过
-  - 且提交是线性的
-
-## 主分支使用说明
-
-- 首先创建项目文件夹，并在项目文件夹下加载python的虚拟环境
-
-```bash
-mkdir your_project; cd your_project
-
-virtualenv venv
-# or
-python -m venv venv
-```
-
+### 创建虚拟环境
 - 进入虚拟环境
 
 ```bash
@@ -55,3 +18,49 @@ call venv/script/activate.bat
 ```bash
 pip install -r requirements.txt
 ```
+
+
+### 创建配置文件
+- 在项目根目录下创建一个`config.yaml`文件
+- 配置文件内容如下，需要修改的只是本机数据库的用户名密码，当然也可以不连本机，前提是安装完成mysql
+- 阿里云oss的账号密码，Djangp的账号密码问我私下要
+```Json
+# database
+database:
+  engine: 'django.db.backends.mysql'
+  name: 'xiaolanshu'
+  host: 'localhost'
+  port: '3306'
+  user: ''
+  password: ''
+
+
+# aliyun oss
+oss:
+    oss_access_key_id: ""
+    oss_access_key_secret: ""
+    oss_end_point: "oss-cn-beijing.aliyuncs.com"
+    oss_bucket_name: "buaaxiaolanshu"
+    oss_bucket_alc_type: "public-read"
+    oss_prefix_url: "https://"
+
+# secret
+django_secret_key:  ''
+```
+
+### 迁移数据库
+- 在项目根目录下运行
+- 会自动创建数据库，表，可在本地查看下
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### 创建超级用户
+- 在项目根目录下运行
+- 会提示输入用户名，邮箱，密码
+- 此账户可用于登录后台管理系统
+```bash
+python manage.py createsuperuser
+```
+

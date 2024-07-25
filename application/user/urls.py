@@ -4,10 +4,10 @@ from .api import *
 
 
 urlpatterns = [
-    path('register', user_register, name='register'),
-    path('login', user_login, name='login'),
-    path('logout', user_logout, name='logout'),
-    path('delete', user_delete, name='delete'),
+    path('register/', user_register, name='register'),
+    path('login/', user_login, name='login'),
+    path('logout/', user_logout, name='logout'),
+    path('delete/', user_delete, name='delete'),
     path('change-avatar', user_change_avatar, name='change_avatar'),
     path('change-password', user_change_password, name='change_password'),
     path('change-info', user_change_info, name='change_info'),

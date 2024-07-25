@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'corsheaders',
     # 自定义应用
     'application.user',
     'application.cafeteria',
@@ -59,6 +60,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -186,5 +188,24 @@ SIMPLEUI_INDEX = 'https://www.baidu.com'
 SIMPLEUI_HOME_INFO = False
 SIMPLEUI_ANALYSIS = False
 
-SIMPLEUI_LOGO = 'https://buaaxiaolanshu.oss-cn-beijing.aliyuncs.com/static/logo-bg-no.svg'
+SIMPLEUI_LOGO = ('https://buaaxiaolanshu.oss-cn-beijing.aliyuncs.com/static/logo-admin.svg')
 
+
+# CORS
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = ['DELETE', 'GET', 'POST', 'PUT']
+CORS_ALLOW_HEADERS = (
+    'XMLHttpRequest',
+    'X_FILENAME',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'Pragma',
+    'Access-Control-Allow-Origin',
+)
