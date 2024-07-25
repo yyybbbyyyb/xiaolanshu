@@ -23,8 +23,8 @@ pip install -r requirements.txt
 ### 创建配置文件
 - 在项目根目录下创建一个`config.yaml`文件
 - 配置文件内容如下，需要修改的只是本机数据库的用户名密码，当然也可以不连本机，前提是安装完成mysql
-- 阿里云oss的账号密码，Djangp的账号密码问我私下要
-```Json
+- 阿里云oss的账号密码，Django的账号密码问我私下要
+```yaml
 # database
 database:
   engine: 'django.db.backends.mysql'
