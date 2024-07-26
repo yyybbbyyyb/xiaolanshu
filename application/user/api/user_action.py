@@ -135,6 +135,34 @@ def get_ate_list(request: HttpRequest):
 
 
 @response_wrapper
+@require_GET
+@jwt_auth()
+def get_post_list(request: HttpRequest):
+    user = User.objects.filter(id=request.user.id).first()
+    data = parse_request_data(request)
+    offset = data.get('offset', 0)
+
+    posts = Post.objects.filter(author=user)
+
+    post_list = []
+    for post in posts[offset:offset + 5]:
+        post_list.append({
+            'id': post.id,
+            'name': post.title,
+            'img': post.images.split(',')[0],
+            'collectCount': PostCollection.objects.filter(post=post).count(),
+            'ateCount': EatCollection.objects.filter(post=post).count(),
+            'user': {
+                'id': post.author.id,
+                'username': post.author.username,
+                'avatar': post.author.avatar.url,
+            },
+        })
+
+    return success_api_response({'info': post_list})
+
+
+@response_wrapper
 @require_POST
 @jwt_auth()
 def collect_post(request: HttpRequest):

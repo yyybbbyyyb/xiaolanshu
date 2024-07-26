@@ -90,7 +90,7 @@ def user_logout(request: HttpRequest):
 @jwt_auth()
 @require_http_methods(['DELETE'])
 def user_delete(request: HttpRequest):
-    user = User(request.user)
+    user = User.objects.get(id=request.user.id)
     if user.avatar != 'media/avatar/default.png':
         user.avatar.delete()
     logout(request)
@@ -106,7 +106,8 @@ def user_delete(request: HttpRequest):
 @jwt_auth()
 @require_POST
 def user_change_avatar(request: HttpRequest):
-    user = User(request.user)
+    user = User.objects.get(id=request.user.id)
+
     avatar = request.FILES.get('avatar')
 
     if avatar:
@@ -148,7 +149,7 @@ def user_change_password(request: HttpRequest):
 @jwt_auth()
 @require_http_methods(['PUT'])
 def user_change_info(request: HttpRequest):
-    user = User(request.user)
+    user = User.objects.get(id=request.user.id)
     data = parse_request_data(request)
 
     username = data.get('username')
@@ -180,9 +181,10 @@ def user_change_info(request: HttpRequest):
         user.introduction = introduction
 
     if student_id:
-        if User.objects.filter(student_id=student_id).exists():
-            return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '学号已存在')
-        user.student_id = student_id
+        if student_id != user.student_id:
+            if User.objects.filter(student_id=student_id).exists():
+                return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '学号已存在')
+            user.student_id = student_id
 
     user.save()
     return success_api_response({'message': '信息修改成功'})
