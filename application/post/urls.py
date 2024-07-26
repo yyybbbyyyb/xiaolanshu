@@ -6,7 +6,9 @@ from .api import *
 urlpatterns = [
     path('detail', get_detail, name='get_detail'),
     path('recommend', get_recommend, name='get_recommend'),
-
+    path('upload/info', upload_info, name='upload_info'),
+    path('upload/images', upload_image, name='upload_image'),
+    path('delete', delete_post, name='delete_post'),
 
 
     path('main', comment_main, name='comment_main'),

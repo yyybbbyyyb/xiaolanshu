@@ -72,7 +72,6 @@ def user_login(request: HttpRequest):
         else:
             token = create_access_token(user)
             refresh_token = create_refresh_token(user)
-            print("成功")
             return success_api_response({'message': '登录成功',
                                          'username': user.username,
                                          'token': token,
@@ -159,18 +158,20 @@ def user_change_info(request: HttpRequest):
     student_id = data.get('student_id')
 
     if username:
-        if User.objects.filter(username=username).exists():
-            return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '用户名已存在')
-        else:
-            pattern = r'^[0-9a-zA-Z_]{5,15}$'
-            if not re.match(pattern, username):
-                return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '用户名需为5-15位字母、数字或下划线')
+        if username != user.username:
+            if User.objects.filter(username=username).exists():
+                return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '用户名已存在')
+            else:
+                pattern = r'^[0-9a-zA-Z_]{5,15}$'
+                if not re.match(pattern, username):
+                    return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '用户名需为5-15位字母、数字或下划线')
             user.username = username
 
     if email:
-        if User.objects.filter(email=email).exists():
-            return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '邮箱已存在')
-        user.email = email
+        if email != user.email:
+            if User.objects.filter(email=email).exists():
+                return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '邮箱已存在')
+            user.email = email
 
     if gender:
         user.gender = gender
@@ -206,6 +207,7 @@ def user_get_info(request: HttpRequest):
 
 
 @response_wrapper
+@jwt_auth()
 @require_GET
 def user_get_info_by_id(request: HttpRequest, user_id: int):
     target_user = User.objects.filter(id=user_id)

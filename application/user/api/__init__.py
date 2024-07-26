@@ -10,4 +10,4 @@ from .user_info import user_get_info_by_id
 
 from .user_auth import refresh_token
 
-from .user_action import get_user_action_info
+from .user_action import *

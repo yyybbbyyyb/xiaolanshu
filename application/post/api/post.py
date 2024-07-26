@@ -3,6 +3,7 @@ from django.db.models import Count
 
 from ...user.models import User, CafeteriaCollection, CounterCollection, PostCollection, EatCollection
 from ..models import Post, Comment
+from ...cafeteria.models import Counter, Dish, Cafeteria
 from ...user.api.user_auth import jwt_auth
 from ...utils import *
 
@@ -69,5 +70,99 @@ def get_recommend(request: HttpRequest):
     })
 
 
+@response_wrapper
+@require_POST
+@jwt_auth()
+def upload_info(request: HttpRequest):
+    user = User.objects.get(id=request.user.id)
+    data = parse_request_data(request)
+
+    counter_id = data.get('counter_id')
+    dish_name = data.get('dish_name')
+    dish_price = data.get('dish_price')
+
+    post_title = data.get('post_title')
+    post_content = data.get('post_content')
+
+    if not counter_id or not dish_name or not dish_price or not post_title or not post_content:
+        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '缺少必要的参数')
+
+    counter = Counter.objects.get(id=counter_id)
+    if not counter:
+        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '窗口不存在')
+
+    dish = Dish.objects.create(name=dish_name, price=dish_price, counter=counter)
+    post = Post.objects.create(dish=dish, title=post_title, content=post_content, author=user)
+
+    return success_api_response({
+        'info': '上传成功',
+        'id': post.id
+    })
 
 
+@response_wrapper
+@require_POST
+@jwt_auth()
+def upload_image(request: HttpRequest):
+    user = User.objects.get(id=request.user.id)
+    data = parse_request_data(request)
+
+    post_id = data.get('id')
+    images = request.FILES.getlist('images')
+
+    if post_id is None or not images:
+        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '缺少必要的参数')
+
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '帖子不存在')
+
+    if post.author != user:
+        return failed_api_response(ErrorCode.REFUSE_ACCESS_ERROR, '无权操作')
+
+    image_urls = []
+    for image in images:
+        img_url = upload_img_file(image, folder='post')
+        if img_url:
+            image_urls.append(img_url)
+
+    if not image_urls:
+        return failed_api_response(ErrorCode.SERVER_ERROR, '图片上传失败')
+
+    if not post.images:
+        post.images = ' '.join(image_urls)
+    else:
+        post.images += ' ' + ' '.join(image_urls)
+
+    post.save()
+
+    return success_api_response({
+        'info': '上传成功',
+        'id': post.id,
+        'image_urls': image_urls
+    })
+
+
+@response_wrapper
+@require_POST
+@jwt_auth()
+def delete_post(request: HttpRequest):
+    user = User.objects.get(id=request.user.id)
+    data = parse_request_data(request)
+
+    post_id = data.get('id')
+    if post_id is None:
+        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '缺少必要的参数')
+
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '帖子不存在')
+
+    if post.author != user:
+        return failed_api_response(ErrorCode.REFUSE_ACCESS_ERROR, '无权操作')
+
+    post.delete()
+
+    return success_api_response({'info': '删除成功'})

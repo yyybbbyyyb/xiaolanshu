@@ -18,9 +18,9 @@ def parse_request_data(request: HttpRequest) -> dict:
     """
     if request.method == 'GET':
         return request.GET.dict()
-    elif request.method == 'POST':
+    elif request.method == 'POST' or request.method == 'PUT' or request.method == 'DELETE':
         try:
-            return json.loads(request.body.decode())
+            return json.loads(request.body)
         except json.JSONDecodeError:
             return {}
     else:
