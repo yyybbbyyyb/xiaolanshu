@@ -24,7 +24,7 @@ def get_all_cafeterias(request: HttpRequest):
         })
 
     return success_api_response({
-        cafeterias_info
+        'info': cafeterias_info
     })
 
 
@@ -57,7 +57,7 @@ def get_counters(request: HttpRequest):
         })
 
     return success_api_response({
-        counters_info
+        "info": counters_info
     })
 
 
@@ -97,7 +97,7 @@ def get_dishes(request: HttpRequest):
             })
 
     return success_api_response({
-        post_info
+        'info': post_info
     })
 
 
