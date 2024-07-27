@@ -95,7 +95,11 @@ def response_wrapper(func):
     def _inner(*args, **kwargs):
         _response = func(*args, **kwargs)
         if isinstance(_response, dict):
-            return JsonResponse(_response)
+            if _response['success']:
+                return JsonResponse(_response)
+            else:
+                status_code = _response.get("data").get("code")
+                return JsonResponse(_response, status=status_code)
     return _inner
 
 
