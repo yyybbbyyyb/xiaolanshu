@@ -128,15 +128,17 @@ def user_change_avatar(request: HttpRequest):
 @jwt_auth()
 @require_POST
 def user_change_password(request: HttpRequest):
+    user = User.objects.get(id=request.user.id)
     data = parse_request_data(request)
 
     old_password = data.get('old_password')
     new_password = data.get('new_password')
 
     if not old_password or not new_password:
+
         return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '内容未填写完整')
 
-    user = authenticate(username=request.user.username, password=old_password)
+    user = authenticate(username=user.email, password=old_password)
     if user is None:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '原密码错误')
     else:
@@ -156,7 +158,6 @@ def user_change_info(request: HttpRequest):
     email = data.get('email')
     gender = data.get('gender')
     introduction = data.get('introduction')
-    student_id = data.get('student_id')
 
     if username:
         if username != user.username:
@@ -180,11 +181,6 @@ def user_change_info(request: HttpRequest):
     if introduction:
         user.introduction = introduction
 
-    if student_id:
-        if student_id != user.student_id:
-            if User.objects.filter(student_id=student_id).exists():
-                return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '学号已存在')
-            user.student_id = student_id
 
     user.save()
     return success_api_response({'message': '信息修改成功'})
@@ -201,7 +197,6 @@ def user_get_info(request: HttpRequest):
         'id': user.id,
         'username': user.username,
         'email': user.email,
-        'student_id': user.student_id,
         'gender': user.gender,
         'introduction': user.introduction,
         'avatar': user.avatar.url,
@@ -219,7 +214,6 @@ def user_get_info_by_id(request: HttpRequest, user_id: int):
         'id': target_user[0].id,
         'username': target_user[0].username,
         'email': target_user[0].email,
-        'student_id': target_user[0].student_id,
         'gender': target_user[0].gender,
         'introduction': target_user[0].introduction,
         'avatar': target_user[0].avatar.url,

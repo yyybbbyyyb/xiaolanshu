@@ -21,6 +21,7 @@ def refresh_token(request: HttpRequest):
         # 获取请求头中的refresh_token
         head = request.META.get('HTTP_AUTHORIZATION')
         if not head:
+            print('token无效 in refresh_token')
             raise jwt.InvalidTokenError
         # 解析token
         refresh_auth_info = head.split(' ')
@@ -46,7 +47,7 @@ def refresh_token(request: HttpRequest):
         # 验证认证与用户的关联，检查token是否过期
         if auth is None or auth.user != user:
             raise jwt.InvalidTokenError
-        if refresh_auth_info.expires_at < timezone.now():
+        if auth.expires_at < timezone.now():
             raise jwt.ExpiredSignatureError
         # 创建新的认证信息
         token = create_access_token(user)

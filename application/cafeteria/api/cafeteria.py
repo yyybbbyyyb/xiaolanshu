@@ -1,14 +1,14 @@
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
 
 from ...user.models import User, CafeteriaCollection, CounterCollection, PostCollection, EatCollection
-from ..models import Cafeteria, Counter
+from ..models import Cafeteria, Counter, Dish
+from ...post.models import Post
 from ...user.api.user_auth import jwt_auth
 from ...utils import *
 
 
 @response_wrapper
 @require_GET
-@jwt_auth(allow_anonymous=True)
 def get_all_cafeterias(request: HttpRequest):
     """
     获取所有食堂信息
@@ -30,18 +30,17 @@ def get_all_cafeterias(request: HttpRequest):
 
 @response_wrapper
 @require_GET
-@jwt_auth(allow_anonymous=True)
 def get_counters(request: HttpRequest):
     """
     获取食堂的窗口信息
     """
-    date = parse_request_data(request)
+    data = parse_request_data(request)
 
-    cafeteria_name = date.get('name')
-    if not cafeteria_name:
+    cafeteria_id = data.get('cafeteriaId')
+    if not cafeteria_id:
         return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '为传入食堂名')
 
-    cafeteria = Cafeteria.objects.get(name=cafeteria_name)
+    cafeteria = Cafeteria.objects.get(id=cafeteria_id)
     if not cafeteria:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '食堂不存在')
 
@@ -63,15 +62,13 @@ def get_counters(request: HttpRequest):
 
 @response_wrapper
 @require_GET
-@jwt_auth(allow_anonymous=True)
 def get_dishes(request: HttpRequest):
     """
     获取窗口的菜品信息, 以帖子的形式返回
     """
-    date = parse_request_data(request)
+    data = parse_request_data(request)
 
-    cafeteria_name = date.get('name')
-    counter_id = date.get('id')
+    counter_id = data.get('counterId')
     if not counter_id:
         return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '未传入窗口id')
 
@@ -79,14 +76,12 @@ def get_dishes(request: HttpRequest):
     if not counter:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '窗口不存在')
 
-    if counter.cafeteria.name != cafeteria_name:
-        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '窗口不属于该食堂')
+    dishes = Dish.objects.filter(counter=counter)
 
-    dishes = counter.dishes.all()
     post_info = []
 
     for dish in dishes:
-        posts = dish.posts.all()
+        posts = Post.objects.filter(dish=dish)
         for post in posts:
             post_info.append({
                 'id': post.id,
@@ -94,6 +89,11 @@ def get_dishes(request: HttpRequest):
                 'img': post.images.split(' ')[0],
                 'collectCount': PostCollection.objects.filter(post=post).count(),
                 'eatCount': EatCollection.objects.filter(post=post).count(),
+                'user': {
+                    'id': post.author.id,
+                    'username': post.author.username,
+                    'avatar': post.author.avatar.url,
+                }
             })
 
     return success_api_response({
@@ -102,15 +102,13 @@ def get_dishes(request: HttpRequest):
 
 
 @response_wrapper
-@require_GET
-@jwt_auth(allow_anonymous=True)
 def get_cafeteria(request: HttpRequest):
     """
     获取食堂信息
     """
     data = parse_request_data(request)
 
-    cafeteria_id = data.get('id')
+    cafeteria_id = data.get('cafeteriaId')
     if not cafeteria_id:
         return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '未传入食堂id')
 
@@ -128,14 +126,13 @@ def get_cafeteria(request: HttpRequest):
 
 @response_wrapper
 @require_GET
-@jwt_auth(allow_anonymous=True)
 def get_counter(request: HttpRequest):
     """
     获取窗口信息
     """
     data = parse_request_data(request)
 
-    counter_id = data.get('id')
+    counter_id = data.get('counterId')
     if not counter_id:
         return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '未传入窗口id')
 

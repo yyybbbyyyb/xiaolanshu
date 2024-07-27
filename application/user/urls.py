@@ -16,6 +16,7 @@ urlpatterns = [
 
     path('refresh-token', refresh_token, name='refresh_token'),
 
+    path('get-post-list', get_post_list, name='get_post_list'),
     path('get-user-action-info', get_user_action_info, name='get_user_action_info'),
     path('get-collect-dishes-list', get_collect_dishes_list, name='get_collect_dishes_list'),
     path('get-collect-counters-list', get_collect_counters_list, name='get_collect_counters_list'),

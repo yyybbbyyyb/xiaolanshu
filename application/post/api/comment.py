@@ -70,8 +70,7 @@ def comment_reply(request: HttpRequest):
 
 
 @response_wrapper
-@require_GET
-@jwt_auth()
+@require_POST
 def get_main_comments(request: HttpRequest):
     data = parse_request_data(request)
 
@@ -101,7 +100,6 @@ def get_main_comments(request: HttpRequest):
                 "avatar": comment.author.avatar.url
             },
             "replyCount": reply_count,
-            "replies": []  # 可以在这里添加若干条子评论
         })
 
     return success_api_response({
@@ -110,8 +108,7 @@ def get_main_comments(request: HttpRequest):
 
 
 @response_wrapper
-@require_GET
-@jwt_auth()
+@require_POST
 def get_reply_comments(request: HttpRequest):
     data = parse_request_data(request)
 

@@ -72,7 +72,7 @@ def failed_api_response(code, error_msg=None) -> dict:
     if error_msg is None:
         error_msg = code.name
     else:
-        error_msg = code.name + ': ' + error_msg
+        error_msg = error_msg
 
     status_code = code.value // 100
     detailed_code = code.value

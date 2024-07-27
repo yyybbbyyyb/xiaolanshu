@@ -24,12 +24,14 @@ def get_user_action_info(request: HttpRequest):
     counters = CounterCollection.objects.filter(collector=user)
     posts = PostCollection.objects.filter(collector=user)
     eats = EatCollection.objects.filter(collector=user)
+    posts_upload = Post.objects.filter(author=user)
 
     return success_api_response({
         'collectDishesId': [post.post.id for post in posts],
         'collectCountersId': [counter.counter.id for counter in counters],
         'collectCafeteriasId': [cafeteria.cafeteria.id for cafeteria in cafeterias],
         'ateId': [eat.post.id for eat in eats],
+        'uploadPostId': [post.id for post in posts_upload],
     })
 
 

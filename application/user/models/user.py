@@ -20,8 +20,6 @@ class User(AbstractUser):
     password = models.CharField(max_length=256, verbose_name='密码')
     email = models.EmailField(max_length=255, verbose_name='邮箱', unique=True, error_messages={'unique': '邮箱已存在'})
 
-    student_id = models.CharField(max_length=10, verbose_name='学号', null=True, blank=True, unique=True,
-                                  error_messages={'unique': '学号已存在'})
     gender_choices = (
         ('null', '沃尔玛购物袋'),
         ('male', '男'),

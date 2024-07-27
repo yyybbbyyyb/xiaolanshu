@@ -1,5 +1,7 @@
+import random
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
 from django.db.models import Count
+from django.utils.dateformat import DateFormat
 
 from ...user.models import User, CafeteriaCollection, CounterCollection, PostCollection, EatCollection
 from ..models import Post, Comment
@@ -10,7 +12,6 @@ from ...utils import *
 
 @response_wrapper
 @require_GET
-@jwt_auth()
 def get_detail(request: HttpRequest):
     data = parse_request_data(request)
 
@@ -20,50 +21,60 @@ def get_detail(request: HttpRequest):
         'title': post.title,
         'content': post.content,
         'id': post.id,
-        'img': post.images.split(' '),
+        'imgs': post.images.split(' '),
         'user': {
             'id': post.author.id,
             'username': post.author.username,
             'avatar': post.author.avatar.url,
         },
-        'created_time': post.created_time,
+        'createTime': post.created_time.strftime('%Y-%m-%d %H:%M:%S'),
         'collectCount': PostCollection.objects.filter(post=post).count(),
         'ateCount': EatCollection.objects.filter(post=post).count(),
         'commentCount': Comment.objects.filter(refer_post=post).count(),
     })
 
 
-def get_recommended_posts(user, offset=0, limit=10):
-    # 基于用户的收藏和吃过的帖子来推荐
-    collected_posts = Post.objects.filter(collected_by=user)
-    eaten_posts = Post.objects.filter(eaten_by=user)
+def get_recommended_posts(offset=0, limit=10):
+    offset = int(offset)
+    limit = int(limit)
 
     # 获取推荐的帖子
     recommended_posts = Post.objects \
-                            .annotate(collect_count=Count('collected_by'), eat_count=Count('eaten_by')) \
-                            .exclude(id__in=collected_posts) \
-                            .exclude(id__in=eaten_posts) \
-                            .order_by('-collect_count', '-eat_count')[offset:offset + limit]
+        .annotate(collect_count=Count('collected_by'), eat_count=Count('eaten_by')) \
+        .order_by('-collect_count', '-eat_count')
 
-    return recommended_posts
+    # 将结果转换为列表并打乱顺序
+    recommended_posts_list = list(recommended_posts)
+    random.shuffle(recommended_posts_list)
+
+    # 保证高点赞和高收藏的帖子优先显示
+    sorted_recommended_posts = sorted(recommended_posts_list, key=lambda post: (post.collect_count, post.eat_count),
+                                      reverse=True)
+
+    # 返回指定范围内的推荐帖子
+    return sorted_recommended_posts[offset:offset + limit]
 
 
 @response_wrapper
 @require_GET
-@jwt_auth()
 def get_recommend(request: HttpRequest):
     data = parse_request_data(request)
     offset = data.get('offset', 0)
 
-    user = User.objects.get(id=request.user.id)
     limit = 10
 
-    recommended_posts = get_recommended_posts(user, offset, limit)
+    recommended_posts = get_recommended_posts(offset, limit)
+
     return success_api_response({
         'posts': [{
             'id': post.id,
             'name': post.title,
             'img': post.images.split(' ')[0],
+            'user': {
+                'id': post.author.id,
+                'username': post.author.username,
+                'avatar': post.author.avatar.url,
+            },
             'collectCount': PostCollection.objects.filter(post=post).count(),
             'ateCount': EatCollection.objects.filter(post=post).count(),
         } for post in recommended_posts]
