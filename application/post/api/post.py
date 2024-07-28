@@ -1,8 +1,7 @@
-import random
 import re
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
 from django.db.models import Count
-from django.utils.dateformat import DateFormat
+from django.db import transaction
 
 from ...user.models import User, CafeteriaCollection, CounterCollection, PostCollection, EatCollection
 from ..models import Post, Comment
@@ -97,7 +96,7 @@ def upload_info(request: HttpRequest):
     post_title = data.get('post_title')
     post_content = data.get('post_content')
 
-    if not counter_id or not dish_name or not dish_price or not post_title or not post_content:
+    if not counter_id or not dish_name or not dish_price or not post_title:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '缺少必要的参数')
 
     counter = Counter.objects.get(id=counter_id)
@@ -116,44 +115,44 @@ def upload_info(request: HttpRequest):
 @response_wrapper
 @require_POST
 @jwt_auth()
-def upload_image(request: HttpRequest):
+def upload_image(request):
     user = User.objects.get(id=request.user.id)
-    data = parse_request_data(request)
 
-    post_id = data.get('id')
-    images = request.FILES.getlist('images')
+    post_id = request.POST.get('id')
+    image = request.FILES.get('file')
 
-    if post_id is None or not images:
+    if post_id is None or not image:
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '缺少必要的参数')
 
-    try:
-        post = Post.objects.get(id=post_id)
-    except Post.DoesNotExist:
-        return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '帖子不存在')
+    img_url = upload_img_file(image, folder='post')
 
-    if post.author != user:
-        return failed_api_response(ErrorCode.REFUSE_ACCESS_ERROR, '无权操作')
-
-    image_urls = []
-    for image in images:
-        img_url = upload_img_file(image, folder='post')
-        if img_url:
-            image_urls.append(img_url)
-
-    if not image_urls:
+    if not img_url:
         return failed_api_response(ErrorCode.SERVER_ERROR, '图片上传失败')
 
-    if not post.images:
-        post.images = ' '.join(image_urls)
-    else:
-        post.images += ' ' + ' '.join(image_urls)
+    # 使用事务确保数据一致性
+    with transaction.atomic():
+        try:
+            post = Post.objects.select_for_update().get(id=post_id)
+        except Post.DoesNotExist:
+            return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '帖子不存在')
 
-    post.save()
+        if post.author != user:
+            return failed_api_response(ErrorCode.REFUSE_ACCESS_ERROR, '无权操作')
+
+        post.refresh_from_db()  # 确保获取最新的 post 实例
+
+        if post.images:
+            post.images += ' ' + img_url
+        else:
+            post.images = img_url
+
+        print('拼接后的图片URL:', post.images)  # 打印调试信息
+        post.save()
 
     return success_api_response({
         'info': '上传成功',
         'id': post.id,
-        'image_urls': image_urls
+        'image_url': img_url
     })
 
 
