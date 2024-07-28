@@ -83,12 +83,10 @@ def get_main_comments(request: HttpRequest):
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, "帖子不存在")
 
     comments = Comment.objects.filter(refer_post=post, refer_to__isnull=True).order_by('-created_at')
-    paginator = Paginator(comments, 10)  # 每页10条评论
-    page_number = offset // 10 + 1
-    page_obj = paginator.get_page(page_number)
+    comments = comments[offset:offset + 10]
 
     comment_list = []
-    for comment in page_obj:
+    for comment in comments:
         reply_count = Comment.objects.filter(refer_to=comment).count()
         comment_list.append({
             "id": comment.id,
@@ -121,12 +119,10 @@ def get_reply_comments(request: HttpRequest):
         return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, "主评论不存在")
 
     replies = Comment.objects.filter(refer_to=main_comment).order_by('-created_at')
-    paginator = Paginator(replies, 10)  # 每页10条评论
-    page_number = offset // 10 + 1
-    page_obj = paginator.get_page(page_number)
+    replies = replies[offset:offset + 10]
 
     reply_list = []
-    for reply in page_obj:
+    for reply in replies:
         reply_list.append({
             "id": reply.id,
             "content": reply.content,
