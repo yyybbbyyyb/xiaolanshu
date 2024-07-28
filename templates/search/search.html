@@ -1,0 +1,16 @@
+<!-- templates/search/search.html -->
+
+<form method="get" action="{% url 'haystack_search' %}">
+    <input type="text" name="q" placeholder="Search...">
+    <input type="submit" value="Search">
+</form>
+
+<h2>Search Results</h2>
+
+<ul>
+    {% for result in page.object_list %}
+        <li><a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a></li>
+    {% empty %}
+        <li>No results found.</li>
+    {% endfor %}
+</ul>

@@ -1,0 +1,6 @@
+{{ object.title }}
+{{ object.content }}
+{{ object.author.username }}
+{{ object.dish.name }}
+{{ object.dish.price }}
+{{ object.dish.counter.name }}

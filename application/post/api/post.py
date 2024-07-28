@@ -2,10 +2,11 @@ import re
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
 from django.db.models import Count
 from django.db import transaction
+from haystack.query import SearchQuerySet
 
-from ...user.models import User, CafeteriaCollection, CounterCollection, PostCollection, EatCollection
+from ...user.models import User, PostCollection, EatCollection
 from ..models import Post, Comment
-from ...cafeteria.models import Counter, Dish, Cafeteria
+from ...cafeteria.models import Counter, Dish
 from ...user.api.user_auth import jwt_auth
 from ...utils import *
 
@@ -62,7 +63,7 @@ def get_recommend(request: HttpRequest):
 
     offset = int(offset)
 
-    limit = 10
+    limit = 20
 
     recommended_posts = get_recommended_posts(offset, limit)
 
@@ -178,3 +179,28 @@ def delete_post(request: HttpRequest):
     post.delete()
 
     return success_api_response({'info': '删除成功'})
+
+
+@response_wrapper
+@require_GET
+def search(request: HttpRequest):
+    query = request.GET.get('query')
+    if query:
+        results = SearchQuerySet().filter(content__contains=query)
+        posts = []
+        for result in results[0:20]:
+            post = result.object
+            posts.append({
+                'id': post.id,
+                'name': post.title,
+                'img': re.split(r'[\s\n\r]+', post.images)[0],
+                'user': {
+                    'id': post.author.id,
+                    'username': post.author.username,
+                    'avatar': post.author.avatar.url,
+                },
+                'collectCount': PostCollection.objects.filter(post=post).count(),
+                'ateCount': EatCollection.objects.filter(post=post).count(),
+            })
+
+    return success_api_response({'posts': posts})
