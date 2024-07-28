@@ -108,19 +108,21 @@ def user_delete(request: HttpRequest):
 def user_change_avatar(request: HttpRequest):
     user = User.objects.get(id=request.user.id)
 
-    avatar = request.FILES.get('avatar')
+    if 'avatar' not in request.FILES:
+        return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '头像未上传')
 
-    if avatar:
-        if avatar.size > 2 * 1024 * 1024:
-            return failed_api_response(ErrorCode.INVALID_REQUEST_ARGUMENT_ERROR, '头像图片大小不能超过2MB')
-        if user.avatar != 'avatar/default.png':
-            user.avatar.delete()
-        avatar.name = user.username + str(timezone.now()) + '.png'
-        user.avatar = avatar
+    new_avatar = request.FILES['avatar']
+
+    if new_avatar:
+        if user.avatar and user.avatar.name != 'avatar/default.png':
+            user.avatar.delete(save=False)
+
+        new_avatar.name = f"{user.username}_{timezone.now().strftime('%Y%m%d%H%M%S')}.png"
+        user.avatar = new_avatar
+        user.save()
     else:
         return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '头像未上传')
 
-    user.save()
     return success_api_response({'message': '头像修改成功', 'url': user.avatar.url})
 
 
