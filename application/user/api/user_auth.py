@@ -41,19 +41,24 @@ def refresh_token(request: HttpRequest):
             raise jwt.InvalidTokenError
         # 获取用户和认证信息
         user_id = payload.get('user_id')
-        user = User.objects.get(id=user_id)
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            raise jwt.InvalidTokenError
         auth_id = payload.get('auth_id')
-        auth = Auth.objects.get(id=auth_id)
-        # 验证认证与用户的关联，检查token是否过期
+        try:
+            auth = Auth.objects.get(id=auth_id)
+        except Auth.DoesNotExist:
+            raise jwt.InvalidTokenError
         if auth is None or auth.user != user:
             raise jwt.InvalidTokenError
         if auth.expires_at < timezone.now():
-            raise jwt.ExpiredSignatureError
+            raise jwt.InvalidTokenError
         # 创建新的认证信息
         token = create_access_token(user)
-        return success_api_response({'token': token})
+        return success_api_response({'token': token,})
     except jwt.InvalidTokenError:
-        return failed_api_response(ErrorCode.INVALID_TOKEN_ERROR, '登陆过期，refresh_token无效，请重新登陆')
+        return failed_api_response(ErrorCode.INVALID_REFRESH_TOKEN_ERROR, '登陆过期，refresh_token无效，请重新登陆')
 
 
 def get_user(request) -> User | None:

@@ -44,6 +44,7 @@ def get_collect_dishes_list(request: HttpRequest):
     data = parse_request_data(request)
     offset = data.get('offset', 0)
 
+    offset = int(offset)
     posts = PostCollection.objects.filter(collector=user)
 
     post_list = []
@@ -55,9 +56,9 @@ def get_collect_dishes_list(request: HttpRequest):
             'collectCount': PostCollection.objects.filter(post=post.post).count(),
             'ateCount': EatCollection.objects.filter(post=post.post).count(),
             'user': {
-                'id': post.collector.id,
-                'username': post.collector.username,
-                'avatar': post.collector.avatar.url,
+                'id': post.post.author.id,
+                'username': post.post.author.username,
+                'avatar': post.post.author.avatar.url,
             },
         })
 
@@ -72,6 +73,7 @@ def get_collect_counters_list(request: HttpRequest):
     data = parse_request_data(request)
     offset = data.get('offset', 0)
 
+    offset = int(offset)
     counters = CounterCollection.objects.filter(collector=user)
 
     counter_list = []
@@ -95,6 +97,8 @@ def get_collect_cafeterias_list(request: HttpRequest):
     data = parse_request_data(request)
     offset = data.get('offset', 0)
 
+    offset = int(offset)
+
     cafeterias = CafeteriaCollection.objects.filter(collector=user)
 
     cafeteria_list = []
@@ -115,7 +119,9 @@ def get_collect_cafeterias_list(request: HttpRequest):
 def get_ate_list(request: HttpRequest):
     user = User.objects.filter(id=request.user.id).first()
     data = parse_request_data(request)
-    offset = data.get('offset', 0)
+    offset = data.get('offset')
+
+    offset = int(offset)
 
     eats = EatCollection.objects.filter(collector=user)
 
@@ -128,9 +134,9 @@ def get_ate_list(request: HttpRequest):
             'collectCount': PostCollection.objects.filter(post=eat.post).count(),
             'ateCount': EatCollection.objects.filter(post=eat.post).count(),
             'user': {
-                'id': eat.collector.id,
-                'username': eat.collector.username,
-                'avatar': eat.collector.avatar.url,
+                'id': eat.post.author.id,
+                'username': eat.post.author.username,
+                'avatar': eat.post.author.avatar.url,
             },
         })
 
@@ -144,6 +150,8 @@ def get_post_list(request: HttpRequest):
     user = User.objects.filter(id=request.user.id).first()
     data = parse_request_data(request)
     offset = data.get('offset', 0)
+
+    offset = int(offset)
 
     posts = Post.objects.filter(author=user)
 
@@ -238,7 +246,6 @@ def cancel_collect_post(request: HttpRequest):
     user = User.objects.filter(id=request.user.id).first()
 
     data = parse_request_data(request)
-    print(data)
 
     post_id = data.get('post_id')
     if not post_id:

@@ -42,14 +42,13 @@ def get_recommended_posts(offset=0, limit=10):
     # 获取推荐的帖子
     recommended_posts = Post.objects \
         .annotate(collect_count=Count('collected_by'), eat_count=Count('eaten_by')) \
-        .order_by('-collect_count', '-eat_count')
+        .annotate(comment_count=Count('comments')) \
+        .order_by('-collect_count', '-eat_count', '-comment_count')
 
-    # 将结果转换为列表并打乱顺序
-    recommended_posts_list = list(recommended_posts)
-    random.shuffle(recommended_posts_list)
-
-    # 保证高点赞和高收藏的帖子优先显示
-    sorted_recommended_posts = sorted(recommended_posts_list, key=lambda post: (post.collect_count, post.eat_count),
+    # 将结果转换为列表并根据热度排序
+    sorted_recommended_posts = sorted(recommended_posts, key=lambda post: (post.collect_count,
+                                                                           post.eat_count,
+                                                                           post.comment_count),
                                       reverse=True)
 
     # 返回指定范围内的推荐帖子
@@ -61,6 +60,8 @@ def get_recommended_posts(offset=0, limit=10):
 def get_recommend(request: HttpRequest):
     data = parse_request_data(request)
     offset = data.get('offset', 0)
+
+    offset = int(offset)
 
     limit = 10
 

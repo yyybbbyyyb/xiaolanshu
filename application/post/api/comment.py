@@ -77,6 +77,7 @@ def get_main_comments(request: HttpRequest):
     post_id = data.get('id')
     offset = int(data.get('offset', 0))
 
+    offset = int(offset)
     try:
         post = Post.objects.get(id=post_id)
     except Post.DoesNotExist:
@@ -111,7 +112,9 @@ def get_reply_comments(request: HttpRequest):
     data = parse_request_data(request)
 
     main_comment_id = data.get('id')
-    offset = int(data.get('offset', 0))
+    offset = data.get('offset', 0)
+
+    offset = int(offset)
 
     try:
         main_comment = Comment.objects.get(id=main_comment_id)

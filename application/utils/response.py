@@ -20,6 +20,7 @@ class ErrorCode(Enum):
     # unauthorized family
     UNAUTHORIZED_ERROR = 401_00
     INVALID_TOKEN_ERROR = 401_01
+    INVALID_REFRESH_TOKEN_ERROR = 401_02
 
     # refuse family
     REFUSE_ACCESS_ERROR = 403_00

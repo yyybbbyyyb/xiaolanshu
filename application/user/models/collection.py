@@ -82,5 +82,5 @@ class EatCollection(models.Model):
         verbose_name_plural = '用户吃过收藏'
 
     def __str__(self):
-        return f'{self.collector.username} 吃过了 {self.collections.title}'
+        return f'{self.collector.username} 吃过了 {self.post.title}'
 
