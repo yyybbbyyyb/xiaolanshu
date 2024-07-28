@@ -2,6 +2,7 @@
 用户收藏、吃过等行为
 """
 
+import re
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
 
 from ..models import User, CafeteriaCollection, CounterCollection, PostCollection, EatCollection
@@ -50,7 +51,7 @@ def get_collect_dishes_list(request: HttpRequest):
         post_list.append({
             'id': post.post.id,
             'name': post.post.title,
-            'img': post.post.images.split(',')[0],
+            'img': re.split(r'[\s\n\r]+', post.post.images)[0],
             'collectCount': PostCollection.objects.filter(post=post.post).count(),
             'ateCount': EatCollection.objects.filter(post=post.post).count(),
             'user': {
@@ -123,7 +124,7 @@ def get_ate_list(request: HttpRequest):
         post_list.append({
             'id': eat.post.id,
             'name': eat.post.title,
-            'img': eat.post.images.split(',')[0],
+            'img': re.split(r'[\s\n\r]+', eat.post.images)[0],
             'collectCount': PostCollection.objects.filter(post=eat.post).count(),
             'ateCount': EatCollection.objects.filter(post=eat.post).count(),
             'user': {
@@ -151,7 +152,7 @@ def get_post_list(request: HttpRequest):
         post_list.append({
             'id': post.id,
             'name': post.title,
-            'img': post.images.split(',')[0],
+            'img': re.split(r'[\s\n\r]+', post.images)[0],
             'collectCount': PostCollection.objects.filter(post=post).count(),
             'ateCount': EatCollection.objects.filter(post=post).count(),
             'user': {

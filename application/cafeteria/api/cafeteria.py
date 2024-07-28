@@ -1,3 +1,4 @@
+import re
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
 
 from ...user.models import User, CafeteriaCollection, CounterCollection, PostCollection, EatCollection
@@ -86,7 +87,7 @@ def get_dishes(request: HttpRequest):
             post_info.append({
                 'id': post.id,
                 'name': post.title,
-                'img': post.images.split(' ')[0],
+                'img': re.split(r'[\s\n\r]+', post.images)[0],
                 'collectCount': PostCollection.objects.filter(post=post).count(),
                 'eatCount': EatCollection.objects.filter(post=post).count(),
                 'user': {

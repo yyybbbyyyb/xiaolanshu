@@ -1,4 +1,5 @@
 import random
+import re
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
 from django.db.models import Count
 from django.utils.dateformat import DateFormat
@@ -21,7 +22,7 @@ def get_detail(request: HttpRequest):
         'title': post.title,
         'content': post.content,
         'id': post.id,
-        'imgs': post.images.split(' '),
+        'imgs': re.split(r'[\s\n\r]+', post.images),
         'user': {
             'id': post.author.id,
             'username': post.author.username,
@@ -69,7 +70,7 @@ def get_recommend(request: HttpRequest):
         'posts': [{
             'id': post.id,
             'name': post.title,
-            'img': post.images.split(' ')[0],
+            'img': re.split(r'[\s\n\r]+', post.images)[0],
             'user': {
                 'id': post.author.id,
                 'username': post.author.username,
