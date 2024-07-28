@@ -238,6 +238,7 @@ def cancel_collect_post(request: HttpRequest):
     user = User.objects.filter(id=request.user.id).first()
 
     data = parse_request_data(request)
+    print(data)
 
     post_id = data.get('post_id')
     if not post_id:
@@ -306,6 +307,7 @@ def eat(request: HttpRequest):
     data = parse_request_data(request)
 
     post_id = data.get('post_id')
+
     if not post_id:
         return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '未传递参数')
 

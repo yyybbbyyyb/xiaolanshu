@@ -89,7 +89,7 @@ def get_dishes(request: HttpRequest):
                 'name': post.title,
                 'img': re.split(r'[\s\n\r]+', post.images)[0],
                 'collectCount': PostCollection.objects.filter(post=post).count(),
-                'eatCount': EatCollection.objects.filter(post=post).count(),
+                'ateCount': EatCollection.objects.filter(post=post).count(),
                 'user': {
                     'id': post.author.id,
                     'username': post.author.username,
