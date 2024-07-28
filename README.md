@@ -5,12 +5,12 @@
   - 及时更新requirements.txt，保证项目可运行
 
 ### 创建虚拟环境
-- 进入虚拟环境
+- 虚拟环境创建+进入
 
 ```bash
+python3 -m venv venv
+
 source venv/bin/activate
-# win下进入虚拟环境
-call venv/script/activate.bat
 ```
 
 - 安装依赖
@@ -22,8 +22,8 @@ pip install -r requirements.txt
 
 ### 创建配置文件
 - 在项目根目录下创建一个`config.yaml`文件
-- 配置文件内容如下，需要修改的只是本机数据库的用户名密码，当然也可以不连本机，前提是安装完成mysql
-- 阿里云oss的账号密码，Django的账号密码问我私下要
+- 配置文件内容如下，需要修改的只是本机数据库的用户名密码
+  - 阿里云oss的账号密码，Django的密码，AI_KEY问我私下要
 ```yaml
 # database
 database:
@@ -45,7 +45,10 @@ oss:
     oss_prefix_url: "https://"
 
 # secret
-django_secret_key:  ''
+django_secret_key: ''
+
+# AI
+ai_api_key: ""
 ```
 
 ### 迁移数据库
@@ -54,6 +57,13 @@ django_secret_key:  ''
 ```bash
 python manage.py makemigrations
 python manage.py migrate
+```
+
+### 建立搜索引擎表
+- 在项目根目录下运行
+- 会自动创建搜索引擎表，可在本地查看下
+```bash
+python manage.py rebuild_index
 ```
 
 ### 创建超级用户

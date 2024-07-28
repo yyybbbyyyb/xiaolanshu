@@ -13,6 +13,8 @@ import os.path
 from pathlib import Path
 import pymysql
 import yaml
+from openai import OpenAI
+
 
 # 解决force_text被弃用而图床上传图片失败的问题
 import django
@@ -232,3 +234,8 @@ HAYSTACK_CONNECTIONS = {
 #         'INDEX_NAME': 'haystack',
 #     },
 # }
+
+
+# AI
+AI_API_KEY = config['ai_api_key']
+

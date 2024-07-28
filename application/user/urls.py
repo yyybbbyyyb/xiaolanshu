@@ -30,4 +30,6 @@ urlpatterns = [
     path('uncollect-counter', cancel_collect_counter, name='cancel_collect_counter'),
     path('uncollect-cafeteria', cancel_collect_cafeteria, name='cancel_collect_cafeteria'),
     path('no-ate', cancel_eat, name='no_ate'),
+
+    path('ai-chat', ai_chat, name='ai_chat'),
 ]

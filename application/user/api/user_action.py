@@ -4,6 +4,8 @@
 
 import re
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
+from django.conf import settings
+from openai import OpenAI
 
 from ..models import User, CafeteriaCollection, CounterCollection, PostCollection, EatCollection
 from ...post.models import Post
@@ -348,3 +350,44 @@ def cancel_eat(request: HttpRequest):
     EatCollection.objects.filter(collector=user, post=post).delete()
 
     return success_api_response({'info': '菜品取消吃过成功'})
+
+
+@response_wrapper
+@require_POST
+@jwt_auth()
+def ai_chat(request: HttpRequest):
+    data = parse_request_data(request)
+
+    message = data.get('message')
+
+    if not message:
+        return failed_api_response(ErrorCode.REQUIRED_ARG_IS_NULL_ERROR, '未传递参数')
+
+    client = OpenAI(
+        api_key=settings.AI_API_KEY,
+        base_url="https://aihubmix.com/v1"
+    )
+
+    completion = client.chat.completions.create(
+        messages=[{
+            "role": "user",
+            "content": "请简略回答，控制回答在30个字以内。" + message + "。只回答我的问题就好，不用多说其他的东西。"
+        }],
+        model="gpt-3.5-turbo",
+        temperature=0.2,
+        top_p=0.7,
+        max_tokens=1024,
+        stream=True
+    )
+
+    message = ""
+
+    for chunk in completion:
+        if chunk.choices[0].delta.content is not None:
+            print(chunk.choices[0].delta.content, end="")
+            message += chunk.choices[0].delta.content
+    print(' ')
+
+    return success_api_response({
+        'message': message
+    })

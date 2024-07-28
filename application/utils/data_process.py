@@ -1,11 +1,7 @@
 import json
 import uuid
 import oss2
-from itertools import chain
 
-from django.core.files.storage import get_storage_class
-from django.db import models
-from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.conf import settings
 
