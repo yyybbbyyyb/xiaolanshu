@@ -186,7 +186,7 @@ SIMPLEUI_CONFIG = {
     'menu_display': ['用户', '食堂', '窗口', '菜品', '帖子'],
 }
 
-SIMPLEUI_INDEX = 'http://localhost:5173/'
+SIMPLEUI_INDEX = 'http://47.93.213.239/'
 
 SIMPLEUI_HOME_INFO = False
 SIMPLEUI_ANALYSIS = False

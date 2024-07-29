@@ -4,3 +4,8 @@
 {{ object.dish.name }}
 {{ object.dish.price }}
 {{ object.dish.counter.name }}
+{{ object.dish.counter.description }}
+{{ object.dish.counter.cafeteria.name }}
+{{ object.dish.counter.cafeteria.address }}
+{{ object.dish.counter.cafeteria.description }}
+
