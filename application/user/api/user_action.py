@@ -371,7 +371,7 @@ def ai_chat(request: HttpRequest):
     completion = client.chat.completions.create(
         messages=[{
             "role": "user",
-            "content": "请简略回答，控制回答在30个字以内。" + message
+            "content": message
         }],
         model="gpt-3.5-turbo",
         temperature=0.2,

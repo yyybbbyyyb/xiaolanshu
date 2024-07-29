@@ -16,7 +16,7 @@ source venv/bin/activate
 - 安装依赖
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirement.txt
 ```
 
 
