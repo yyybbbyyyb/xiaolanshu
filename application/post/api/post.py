@@ -1,4 +1,6 @@
 import re
+import random
+from datetime import datetime
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
 from django.db.models import Count
 from django.db import transaction
@@ -35,7 +37,7 @@ def get_detail(request: HttpRequest):
     })
 
 
-def get_recommended_posts(offset=0, limit=10):
+def get_recommended_posts(offset=0, limit=10, is_breakfast=False):
     offset = int(offset)
     limit = int(limit)
 
@@ -51,6 +53,24 @@ def get_recommended_posts(offset=0, limit=10):
                                                                            post.comment_count),
                                       reverse=True)
 
+    # 取出高赞的帖子75个，剩下的都是低赞，打乱顺序返回，保证高赞的在低赞前面
+    high = []
+    if is_breakfast:
+        counter = Counter.objects.get(id=36)
+        dishes = Dish.objects.filter(counter=counter)
+        for dish in dishes:
+            posts = Post.objects.filter(dish=dish)
+            for post in posts:
+                high.append(post)
+    else:
+        high = sorted_recommended_posts[:75]
+    low = sorted_recommended_posts[75:]
+
+    random.shuffle(high)
+    random.shuffle(low)
+
+    sorted_recommended_posts = high[:10] + low
+
     # 返回指定范围内的推荐帖子
     return sorted_recommended_posts[offset:offset + limit]
 
@@ -64,6 +84,10 @@ def get_recommend(request: HttpRequest):
     offset = int(offset)
 
     limit = 20
+
+    # 如果是早上，则推荐早餐帖子
+    if 6 <= datetime.now().hour < 10:
+        recommended_posts = get_recommended_posts(offset, limit, )
 
     recommended_posts = get_recommended_posts(offset, limit)
 
