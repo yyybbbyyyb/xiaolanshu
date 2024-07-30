@@ -88,8 +88,8 @@ def get_recommend(request: HttpRequest):
     # 如果是早上，则推荐早餐帖子
     if 6 <= datetime.now().hour < 10:
         recommended_posts = get_recommended_posts(offset, limit, )
-
-    recommended_posts = get_recommended_posts(offset, limit)
+    else:
+        recommended_posts = get_recommended_posts(offset, limit)
 
     return success_api_response({
         'posts': [{
